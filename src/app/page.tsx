@@ -73,13 +73,17 @@ export default function HomePage() {
         </div>
 
         {/* Warning */}
-        <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <p className="text-amber-800 text-xs font-medium mb-1">⚠️ Perhatian</p>
-          <ul className="text-amber-700 text-xs space-y-1">
-            <li>• Pastikan NIM yang kamu masukkan benar</li>
-            <li>• Setiap NIM hanya bisa mengerjakan 1x</li>
-            <li>• Jangan berpindah tab selama mengerjakan</li>
-            <li>• Quiz akan otomatis submit jika waktu habis</li>
+        <div className="mt-6 bg-red-50 border border-red-200 rounded-xl p-4">
+          <p className="text-red-800 text-sm font-bold mb-2 flex items-center gap-1.5">
+            ⚠️ Peraturan & Sistem Anti-Cheat
+          </p>
+          <ul className="text-red-700 text-xs space-y-1.5 list-disc list-inside">
+            <li>Pastikan NIM yang kamu masukkan benar (Tepat 10 Digit). Setiap NIM hanya bisa mengerjakan <strong>1 kali</strong>.</li>
+            <li>Sistem otomatis memaksa browser masuk ke mode <strong>Fullscreen (Layar Penuh)</strong> selama pengerjaan.</li>
+            <li>Dilarang keras berpindah tab browser, me-minimize window, membuka window aplikasi lain, atau mengklik di luar area browser.</li>
+            <li><strong>Batas Toleransi:</strong> Maksimal <strong>3 kali pelanggaran fokus</strong> (pindah tab / klik luar). Jika dilanggar 3 kali, sistem akan langsung melakukan <strong>SUBMIT PAKSA (Force Submit)</strong> ujian Anda.</li>
+            <li>Dilarang keras melakukan klik kanan, select/copy teks soal, atau membuka Chrome DevTools (Inspect Element).</li>
+            <li>Jawaban per soal akan tersimpan dan berlanjut otomatis jika waktu countdown habis.</li>
           </ul>
         </div>
       </div>
