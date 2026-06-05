@@ -9,7 +9,7 @@ export default function HomePage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const nimRegex = /^[0-9]{8,12}$/;
+  const nimRegex = /^[0-9]{10}$/;
 
   function handleSubmit() {
     setError("");
@@ -20,7 +20,7 @@ export default function HomePage() {
     }
 
     if (!nimRegex.test(nim.trim())) {
-      setError("Format NIM tidak valid (8-12 digit angka)");
+      setError("Format NIM tidak valid (harus 10 digit angka)");
       return;
     }
 
@@ -54,8 +54,8 @@ export default function HomePage() {
               value={nim}
               onChange={(e) => setNim(e.target.value.replace(/\D/g, ""))}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-              placeholder="Contoh: 12345678"
-              maxLength={12}
+              placeholder="Contoh: 1234567890"
+              maxLength={10}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
             {error && (

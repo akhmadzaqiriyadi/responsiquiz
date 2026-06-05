@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validasi format NIM (sesuaikan regex dengan format NIM kampus kamu)
-    const nimRegex = /^[0-9]{8,12}$/;
+    const nimRegex = /^[0-9]{10}$/;
     if (!nimRegex.test(nim)) {
       return NextResponse.json({ error: "Format NIM tidak valid" }, { status: 400 });
     }

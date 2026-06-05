@@ -33,9 +33,7 @@ export default function AdminPage() {
   // Custom alert & confirm states
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [confirmMessage, setConfirmMessage] = useState("");
-  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
+  const [confirmStep, setConfirmStep] = useState(0); // 0: closed, 1: step 1, 2: step 2
 
   const fetchData = useCallback(async () => {
     try {
@@ -88,18 +86,7 @@ export default function AdminPage() {
   }
 
   function handleReset() {
-    setConfirmMessage("⚠️ Reset akan menghapus SEMUA data hasil quiz! Lanjutkan?");
-    setConfirmAction(() => () => {
-      // Step 2 confirmation
-      setTimeout(() => {
-        setConfirmMessage("Yakin? Data yang dihapus tidak bisa dikembalikan.");
-        setConfirmAction(() => () => {
-          executeReset();
-        });
-        setShowConfirm(true);
-      }, 100);
-    });
-    setShowConfirm(true);
+    setConfirmStep(1);
   }
 
   function handleExportCSV() {
@@ -329,7 +316,7 @@ export default function AdminPage() {
       )}
 
       {/* Custom Confirm Modal */}
-      {showConfirm && (
+      {confirmStep > 0 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl mx-4 animate-in fade-in zoom-in duration-200">
             <div className="text-center">
@@ -337,22 +324,32 @@ export default function AdminPage() {
                 ⚠️
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Konfirmasi</h3>
-              <p className="text-gray-600 text-sm mb-6">{confirmMessage}</p>
+              <p className="text-gray-600 text-sm mb-6">
+                {confirmStep === 1
+                  ? "⚠️ Reset akan menghapus SEMUA data hasil quiz! Lanjutkan?"
+                  : "Yakin? Data yang dihapus tidak bisa dikembalikan."}
+              </p>
               <div className="flex gap-3">
                 <button
-                  onClick={() => setShowConfirm(false)}
-                  className="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl transition-colors cursor-pointer"
+                  onClick={() => setConfirmStep(0)}
+                  disabled={resetting}
+                  className="w-1/2 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 text-gray-700 font-semibold py-2.5 rounded-xl transition-colors cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
-                  onClick={() => {
-                    setShowConfirm(false);
-                    confirmAction?.();
+                  onClick={async () => {
+                    if (confirmStep === 1) {
+                      setConfirmStep(2);
+                    } else if (confirmStep === 2) {
+                      setConfirmStep(0);
+                      await executeReset();
+                    }
                   }}
-                  className="w-1/2 bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl transition-colors cursor-pointer"
+                  disabled={resetting}
+                  className="w-1/2 bg-red-600 hover:bg-red-700 disabled:bg-red-300 text-white font-semibold py-2.5 rounded-xl transition-colors cursor-pointer"
                 >
-                  Lanjutkan
+                  {resetting ? "Mereset..." : "Lanjutkan"}
                 </button>
               </div>
             </div>
