@@ -222,8 +222,9 @@ export default function QuizPage() {
 
           {/* Opsi */}
           <div className="space-y-3">
-            {soalSekarang?.opsi.map((opsi) => {
+            {soalSekarang?.opsi.map((opsi, index) => {
               const dipilih = jawaban[soalSekarang.id] === opsi.key;
+              const labelHuruf = ["A", "B", "C", "D"][index];
               return (
                 <button
                   key={opsi.key}
@@ -236,7 +237,7 @@ export default function QuizPage() {
                 >
                   <span className={`inline-block w-7 h-7 rounded-full text-sm font-bold mr-3 text-center leading-7
                     ${dipilih ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-600"}`}>
-                    {opsi.key.toUpperCase()}
+                    {labelHuruf}
                   </span>
                   {opsi.text}
                 </button>
