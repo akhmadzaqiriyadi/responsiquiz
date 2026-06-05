@@ -30,6 +30,13 @@ export default function AdminPage() {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
+  // Custom alert & confirm states
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState("");
+  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
+
   const fetchData = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/hasil");
@@ -59,25 +66,40 @@ export default function AdminPage() {
     router.replace("/admin/login");
   }
 
-  async function handleReset() {
-    const confirm1 = window.confirm("⚠️ Reset akan menghapus SEMUA data hasil quiz!\n\nLanjutkan?");
-    if (!confirm1) return;
-    const confirm2 = window.confirm("Yakin? Data yang dihapus tidak bisa dikembalikan.");
-    if (!confirm2) return;
-
+  async function executeReset() {
     setResetting(true);
     try {
       const res = await fetch("/api/admin/reset", { method: "POST" });
       const data = await res.json();
       if (data.success) {
-        alert("✅ Data berhasil direset");
+        setAlertMessage("✅ Data quiz berhasil direset!");
+        setShowAlert(true);
         fetchData();
+      } else {
+        setAlertMessage("❌ Gagal reset: " + (data.error || "Gagal"));
+        setShowAlert(true);
       }
     } catch {
-      alert("Gagal reset");
+      setAlertMessage("❌ Gagal reset karena masalah koneksi");
+      setShowAlert(true);
     } finally {
       setResetting(false);
     }
+  }
+
+  function handleReset() {
+    setConfirmMessage("⚠️ Reset akan menghapus SEMUA data hasil quiz! Lanjutkan?");
+    setConfirmAction(() => () => {
+      // Step 2 confirmation
+      setTimeout(() => {
+        setConfirmMessage("Yakin? Data yang dihapus tidak bisa dikembalikan.");
+        setConfirmAction(() => () => {
+          executeReset();
+        });
+        setShowConfirm(true);
+      }, 100);
+    });
+    setShowConfirm(true);
   }
 
   function handleExportCSV() {
@@ -277,13 +299,66 @@ export default function AdminPage() {
           )}
 
           {/* Footer */}
-          {hasilFiltered.length > 0 && (
-            <div className="px-4 py-3 bg-slate-50 border-t text-xs text-gray-500 text-right">
-              Menampilkan {hasilFiltered.length} dari {hasil.length} peserta
-            </div>
-          )}
-        </div>
+        {hasilFiltered.length > 0 && (
+          <div className="px-4 py-3 bg-slate-50 border-t text-xs text-gray-500 text-right">
+            Menampilkan {hasilFiltered.length} dari {hasil.length} peserta
+          </div>
+        )}
       </div>
+    </div>
+
+      {/* Custom Alert Modal */}
+      {showAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl mx-4 animate-in fade-in zoom-in duration-200">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+                ℹ️
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Info</h3>
+              <p className="text-gray-600 text-sm mb-6">{alertMessage}</p>
+              <button
+                onClick={() => setShowAlert(false)}
+                className="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 rounded-xl transition-colors cursor-pointer"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Confirm Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl mx-4 animate-in fade-in zoom-in duration-200">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+                ⚠️
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Konfirmasi</h3>
+              <p className="text-gray-600 text-sm mb-6">{confirmMessage}</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowConfirm(false)}
+                  className="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={() => {
+                    setShowConfirm(false);
+                    confirmAction?.();
+                  }}
+                  className="w-1/2 bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl transition-colors cursor-pointer"
+                >
+                  Lanjutkan
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
