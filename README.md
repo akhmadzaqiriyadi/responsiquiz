@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Quiz Responsi
 
-## Getting Started
+Aplikasi quiz untuk responsi mahasiswa berbasis Next.js 16 + Google Sheets.
 
-First, run the development server:
+## Setup Google Service Account
+1. Buka https://console.cloud.google.com
+2. Buat project baru atau pilih project yang ada
+3. Enable Google Sheets API
+4. Buat Service Account: IAM & Admin → Service Accounts → Create
+5. Buat key JSON untuk service account tersebut
+6. Salin `client_email` ke `GOOGLE_SERVICE_ACCOUNT_EMAIL`
+7. Salin `private_key` ke `GOOGLE_PRIVATE_KEY`
+8. Buka Google Sheet kamu → Share → tambahkan email service account dengan role Editor
+9. Salin Sheet ID dari URL (bagian antara /d/ dan /edit) ke `GOOGLE_SHEET_ID`
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Setup Project
+1. Clone repo
+2. Copy `.env.example` ke `.env.local` dan isi semua variabel
+3. `npm install`
+4. `npm run dev`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Struktur Google Sheet
+- Tab `soal`: id, pertanyaan, opsi_a, opsi_b, opsi_c, opsi_d, jawaban_benar
+- Tab `hasil`: nim, skor, total_soal, timestamp

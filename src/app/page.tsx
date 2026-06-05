@@ -1,66 +1,88 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+export default function HomePage() {
+  const router = useRouter();
+  const [nim, setNim] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const nimRegex = /^[0-9]{8,12}$/;
+
+  function handleSubmit() {
+    setError("");
+
+    if (!nim.trim()) {
+      setError("NIM tidak boleh kosong");
+      return;
+    }
+
+    if (!nimRegex.test(nim.trim())) {
+      setError("Format NIM tidak valid (8-12 digit angka)");
+      return;
+    }
+
+    setLoading(true);
+    sessionStorage.setItem("quiz_nim", nim.trim());
+    router.push("/quiz");
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-gradient-to-br from-blue-950 to-indigo-900 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900">Quiz Responsi</h1>
+          <p className="text-gray-500 mt-1 text-sm">Masukkan NIM kamu untuk memulai</p>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        {/* Form */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              NIM Mahasiswa
+            </label>
+            <input
+              type="text"
+              value={nim}
+              onChange={(e) => setNim(e.target.value.replace(/\D/g, ""))}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              placeholder="Contoh: 12345678"
+              maxLength={12}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            {error && (
+              <p className="text-red-500 text-sm mt-1">{error}</p>
+            )}
+          </div>
+
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 text-white font-semibold py-3 rounded-xl transition-colors duration-200 text-base"
           >
-            Documentation
-          </a>
+            {loading ? "Memuat soal..." : "Mulai Quiz →"}
+          </button>
         </div>
-      </main>
-    </div>
+
+        {/* Warning */}
+        <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <p className="text-amber-800 text-xs font-medium mb-1">⚠️ Perhatian</p>
+          <ul className="text-amber-700 text-xs space-y-1">
+            <li>• Pastikan NIM yang kamu masukkan benar</li>
+            <li>• Setiap NIM hanya bisa mengerjakan 1x</li>
+            <li>• Jangan berpindah tab selama mengerjakan</li>
+            <li>• Quiz akan otomatis submit jika waktu habis</li>
+          </ul>
+        </div>
+      </div>
+    </main>
   );
 }
